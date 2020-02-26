@@ -1,36 +1,29 @@
-import {GraphQLServer} from 'graphql-yoga'
+import {PubSub, GraphQLServer} from 'graphql-yoga'
 
-// Type definitions
-const typeDefs = `
-  type User {
-    id: ID!
-    name: String!
-    email: String!
-  }
-
-  type Query {
-    me: User
-    greeting(name: String!, age: Int!): String!
-  }
-`
+import Query from './resolvers/Query.resolver'
+import Subscription from './resolvers/Subscription.resolver'
+import Mutation from './resolvers/Mutation.resolver'
+import * as db from './db'
 
 // Resolvers
 const resolvers = {
-  Query: {
-    me: () => ({
-      id: 1,
-      name: 'Khanh Pham',
-      email: 'khanh@gmail.com',
-    }),
-    greeting: (_, {name, age}) => {
-      return `Hi ${name}, age: ${age}`
-    },
-  }
+  Query,
+  Subscription,
+  Mutation,
 }
 
+const pubsub = new PubSub()
+
 const server = new GraphQLServer({
-  typeDefs,
+  typeDefs: './src/schema.graphql',
   resolvers,
+  context: {
+    db,
+    pubsub,
+  },
+  resolverValidationOptions: {
+    requireResolversForResolveType: false,
+  },
 })
 
 const options = {

@@ -1,0 +1,71 @@
+interface Node {
+  id: ID!
+  createdAt: String!
+  updatedAt: String
+}
+
+type User implements Node {
+  id: ID!
+  createdAt: String!
+  updatedAt: String
+  email: String!
+  firstName: String!
+  lastName: String
+}
+
+type Comment implements Node {
+  id: ID!
+  createdAt: String!
+  updatedAt: String
+  content: String
+  by: User!
+  on: Post!
+}
+
+type Post implements Node {
+  id: ID!
+  createdAt: String!
+  updatedAt: String
+  title: String!
+  slug: String!
+  content: String
+  comments: [Comment!]
+  by: User!
+}
+
+type Query {
+  users: [User!]
+  comments: [Comment!]
+  posts: [Post!]
+}
+
+type Mutation {
+  createComment(input: CreateCommentInput): Comment!
+}
+
+type Subscription {
+  count: Int!
+  comment(input: CommentSubscriptionInput): CommentSubscriptionData!
+}
+
+enum MutationType {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+input CreateCommentInput {
+  createdAt: String!
+  content: String
+  by: ID!
+  on: ID!
+}
+
+input CommentSubscriptionInput {
+  postId: ID!
+}
+
+type CommentSubscriptionData {
+  mutationType: MutationType!
+  payload: Comment!
+}
